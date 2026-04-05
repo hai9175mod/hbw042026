@@ -1,6 +1,6 @@
 // 1. FIX LỖI SSL TRÊN HOSTING (BẮT BUỘC ĐỂ DÒNG ĐẦU TIÊN)
 
-const API_URL = 'https://api.hbw.com.vn/graphql';
+const API_URL = 'https://api2.hbw.com.vn/graphql';
 
 // Hàm định dạng ngày tháng
 export function formatDate(dateString: string) {
