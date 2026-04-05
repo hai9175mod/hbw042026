@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography"; /* Thêm dòng này vào */
+/* Cấu hình Theme trực tiếp tại đây */
+@theme {
+  /* 1. Định nghĩa bảng màu (Tự động tạo ra class text-primary, bg-primary...) */
+  --color-primary: #d4a860;    /* Vàng thương hiệu */
+  --color-secondary: #2c2c2c;  /* Đen thương hiệu */
+  --color-text-main: #000000;  /* Chữ nội dung */
+
+  /* 2. Định nghĩa Font chữ (kết nối với biến CSS từ Next.js) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* 3. Cỡ chữ cơ bản */
+  --text-base: 16px;
+}
+
+/* Custom Utilities (Các class tự tạo thêm) */
+@utility bg-gradient-brand {
+  background-image: linear-gradient(135deg, #ffffff 0%, #fffbf2 100%);
+}
+
+@utility bg-gradient-accent {
+  background-image: linear-gradient(90deg, #d4a860 0%, #eac485 100%);
+}
+
+/* Reset cơ bản & Scroll mượt */
+:root {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-text-main);
+  background-color: #ffffff;
+  /* Font mặc định sẽ ăn theo --font-sans đã khai báo ở trên */
+  font-family: var(--font-sans); 
+}
