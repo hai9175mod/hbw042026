@@ -1,4 +1,5 @@
 // 1. FIX LỖI SSL TRÊN HOSTING (BẮT BUỘC ĐỂ DÒNG ĐẦU TIÊN)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
 
 const API_URL = 'https://api2.hbw.com.vn/graphql';
 
@@ -81,10 +82,18 @@ export async function getPostBySlug(slug: string) {
   let processedContent = post.content || "";
 
   // Regex "Bắt dính" mọi biến thể domain (http, https, www, dấu nháy đơn/kép)
-  const domainRegex = /href=(["'])https?:\/\/(www\.)?api\.hbw\.com\.vn\/?/g;
+  // Đã thêm '2?' để bắt được cả api.hbw và api2.hbw
+  const domainRegex = /href=(["'])https?:\/\/(www\.)?api2?\.hbw\.com\.vn\/?/g;
 
   // Thay thế bằng: href="/ (Giữ nguyên dấu nháy gốc $1 để HTML không bị lỗi)
   processedContent = processedContent.replace(domainRegex, 'href=$1/');
+
+  // --- SỬA LỖI ẢNH ĐẠI DIỆN TRÊN VERCEL ---
+  let thumbUrl = post.featuredImage?.node?.sourceUrl || "";
+  // Nếu WP trả về link tương đối (/wp-content...), chèn thêm domain vào
+  if (thumbUrl.startsWith('/')) {
+    thumbUrl = `https://api2.hbw.com.vn${thumbUrl}`;
+  }
 
   // Map dữ liệu chuẩn cấu trúc
   return {
@@ -93,10 +102,10 @@ export async function getPostBySlug(slug: string) {
     content: { rendered: processedContent }, // Nội dung đã xử lý link
     excerpt: { rendered: post.excerpt },
     _embedded: {
-      'wp:featuredmedia': post.featuredImage?.node 
+      'wp:featuredmedia': thumbUrl 
         ? [{ 
-            sourceUrl: post.featuredImage.node.sourceUrl, // Cho code mới
-            source_url: post.featuredImage.node.sourceUrl // Cho code cũ
+            sourceUrl: thumbUrl, // Code mới dùng biến đã vá domain
+            source_url: thumbUrl // Code cũ dùng biến đã vá domain
           }] 
         : []
     },
@@ -142,7 +151,13 @@ export async function getPostsByCategory(categorySlug: string, first: number = 6
 
   // Transform data
   const mappedPosts = posts.map((post: any) => {
-    const imgUrl = post.featuredImage?.node?.sourceUrl || null;
+    let imgUrl = post.featuredImage?.node?.sourceUrl || null;
+    
+    // --- SỬA LỖI ẢNH ĐẠI DIỆN TRÊN VERCEL ---
+    // NẾU LÀ LINK TƯƠNG ĐỐI THÌ NỐI THÊM DOMAIN VÀO
+    if (imgUrl && imgUrl.startsWith('/')) {
+      imgUrl = `https://api2.hbw.com.vn${imgUrl}`;
+    }
     
     return {
       ...post,
